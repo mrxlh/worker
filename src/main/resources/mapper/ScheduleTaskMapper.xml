@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.collmall.mapper.ScheduleTaskMapper">
+
+    <resultMap id="taskDomain" type="com.collmall.model.ScheduleTask">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="taskType" column="task_type" jdbcType="VARCHAR"/>
+        <result property="taskKey1" column="task_key1" jdbcType="VARCHAR"/>
+        <result property="taskKey2" column="task_key2" jdbcType="VARCHAR"/>
+        <result property="bodyClass" column="body_class" jdbcType="VARCHAR"/>
+        <result property="taskBody" column="task_body" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="executeCount" column="execute_count" jdbcType="INTEGER"/>
+        <result property="lastTime" column="last_time" jdbcType="TIMESTAMP"/>
+        <result property="regionNo" column="region_no" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="fingerprint" column="fingerprint" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="monitorDomain" type="com.collmall.model.ScheduleMonitorDTO">
+        <result property="backlogCount" column="backlogCount"/>
+        <result property="errorCount" column="errorCount"/>
+    </resultMap>
+
+    <sql id="where_condition">
+        <where>
+            <if test="taskType != null">
+                and task_type = #{taskType}
+            </if>
+            <if test="fingerprint != null">
+                and fingerprint = #{fingerprint}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time &lt; #{endTime}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="base_column">
+      id,create_time,task_type,task_key1,task_key2,body_class,
+      task_body,status,execute_count,last_time,region_no,remark,fingerprint
+   </sql>
+
+    <select id="queryList"   parameterType="com.collmall.query.WorkerQuery"  resultMap="taskDomain">
+        select
+        <include refid="base_column"/>
+        from schedule_task_${tableFix}
+        <include refid="where_condition"/>
+        order by create_time
+        <if test="page > 0 ">
+            limit #{startRecord} , #{pageSize}
+        </if>
+    </select>
+
+    <select  id="count" resultType="int" parameterType="com.collmall.query.WorkerQuery">
+        select COUNT(1) from
+        schedule_task_${tableFix}
+        <include refid="where_condition"/>
+    </select>
+
+
+
+    <select id="queryExecuteTasks" resultMap="taskDomain"
+            resultType="com.collmall.model.ScheduleTask"
+            parameterType="map">
+        select
+        id,create_time,task_type,task_key1,task_key2,body_class,task_body,status,execute_count,last_time,region_no,remark,fingerprint
+        from schedule_task_${tableFix}
+        where
+        task_type=#{taskType,jdbcType=VARCHAR} <!--and region_no in
+        <foreach item="region" index="index" collection="regions" open="(" separator="," close=")">
+            #{region,jdbcType=INTEGER}
+        </foreach>-->
+        and (status=#{statusInit,jdbcType=INTEGER} or
+        (status=#{statusExecuting,jdbcType=INTEGER} and last_time &lt; DATE_SUB(now(),INTERVAL ${lastTime} SECOND) ) or
+        (status=#{statusError,jdbcType=INTEGER} and execute_count&lt;=#{retryCount,jdbcType=INTEGER} and last_time &lt;
+        DATE_SUB(now(),INTERVAL ${lastTime} SECOND) )
+        )
+        limit 0,${fetchCount}
+    </select>
+
+    <select id="queryExecuteTasks1" resultMap="taskDomain" parameterType="map" resultType="com.collmall.model.ScheduleTask">
+        select
+        id,create_time,task_type,task_key1,task_key2,body_class,task_body,status,execute_count,last_time,region_no,remark,fingerprint
+        from schedule_task_${tableFix}
+        where
+        task_type=#{taskType,jdbcType=VARCHAR}
+        and (status=#{statusInit,jdbcType=INTEGER} )
+        limit 0,10000
+    </select>
+
+    <select id="queryTask" resultMap="taskDomain" resultType="com.collmall.model.ScheduleTask" parameterType="map">
+        SELECT
+            id,
+            create_time,
+            task_type,
+            task_key1,
+            task_key2,
+            body_class,
+            task_body,
+            status,
+            execute_count,
+            last_time,
+            region_no,
+            remark,
+            fingerprint
+        FROM schedule_task_${tableFix}
+        WHERE id = #{taskId,jdbcType=BIGINT}
+    </select>
+
+    <select id="deleteTask" parameterType="map">
+        DELETE FROM schedule_task_${tableFix} WHERE id = #{taskId,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insertTask" parameterType="com.collmall.model.ScheduleTask" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+            schedule_task_${tableFix}(create_time, task_type, task_key1, task_key2, body_class, task_body, STATUS, last_time, region_no, remark, fingerprint)
+        VALUES (now(), #{taskType,jdbcType=VARCHAR}, #{taskKey1,jdbcType=VARCHAR}, #{taskKey2,jdbcType=VARCHAR}, #{bodyClass,jdbcType=VARCHAR}, #{taskBody,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, now(), #{regionNo,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{fingerprint,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="lockTasks" parameterType="map">
+        update schedule_task_${tableFix} SET
+        status=#{status,jdbcType=INTEGER},last_time=now() where id in
+        <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+            #{id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="errorTask" parameterType="map">
+        UPDATE schedule_task_${tableFix} SET
+        STATUS =#{status,jdbcType=INTEGER}, execute_count=execute_count+1, last_time=now(), remark=#{remark,jdbcType=VARCHAR}
+        WHERE id=#{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="doneTask" parameterType="com.collmall.model.ScheduleTask">
+        UPDATE schedule_task_${tableFix} SET
+        STATUS =#{status,jdbcType=INTEGER}, last_time=now()
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertTableFix" parameterType="map">
+        INSERT INTO schedule_tablefix (task_type, table_fix)
+        VALUES (#{taskType,jdbcType=VARCHAR}, #{tableFix,jdbcType=INTEGER})
+    </insert>
+
+    <select id="queryTableFixs" resultType="map">
+        SELECT task_type, table_fix FROM schedule_tablefix
+    </select>
+
+    <select id="queryMonitorCount" resultMap="monitorDomain">
+        SELECT
+        (SELECT COUNT(1) FROM schedule_task_${tableFix} WHERE task_type=#{taskType} and STATUS =0) AS backlogCount,
+        (SELECT COUNT(1) FROM schedule_task_${tableFix} WHERE task_type=#{taskType} and  STATUS =10
+          AND execute_count &gt;= #{dataRetryCount,jdbcType=INTEGER}
+        ) AS errorCount
+    </select>
+
+    <select id="queryByFingerprint" parameterType="java.lang.String" resultMap="taskDomain">
+      SELECT id,
+            create_time,
+            task_type,
+            task_key1,
+            task_key2,
+            body_class,
+            task_body,
+            status,
+            execute_count,
+            last_time,
+            region_no,
+            remark,
+            fingerprint
+      FROM schedule_task_${tableFix}
+      WHERE fingerprint=#{fingerprint}
+    </select>
+
+    <select id="queryInitCount" resultType="int">
+      SELECT COUNT(1)
+      FROM schedule_task_${tableFix}
+      WHERE  task_type=#{taskType} and  status=0 AND execute_count=0 AND create_time &lt;= DATE_SUB(now(),INTERVAL 60 SECOND);
+    </select>
+
+    <update id="updateTaskByfingerPrint">
+        UPDATE schedule_task_${tableFix} SET STATUS =#{status,jdbcType=INTEGER}, execute_count=#{executeCount,jdbcType=INTEGER}
+        WHERE fingerprint=#{fingerPrint,jdbcType=VARCHAR}
+    </update>
+
+    <select id="listDoneTask" parameterType="map"  resultType="int">
+      SELECT id
+      FROM schedule_task_${tableFix}
+      WHERE status = 2 and task_type=#{taskType} and last_time &lt; #{lastDate,jdbcType=TIMESTAMP} order by id limit 0,${fetchCount}
+    </select>
+
+    <delete id="cleanUp" parameterType="map">
+        delete from schedule_task_${tableFix} where id in
+        <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+            #{id,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <select id="optimizeTable" parameterType="map" resultType="map">
+    	optimize table schedule_task_${tableFix}
+    </select>
+
+</mapper>

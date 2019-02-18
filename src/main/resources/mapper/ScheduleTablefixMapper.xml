@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.collmall.mapper.ScheduleTablefixMapper">
+    <resultMap id="taskDomain" type="com.collmall.model.ScheduleTablefix">
+        <result property="id" column="r_id" jdbcType="INTEGER"/>
+        <result property="taskType" column="task_type" jdbcType="VARCHAR"/>
+        <result property="tableFix" column="table_fix" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+   <sql id="where_condition">
+      <where>
+          <if test="taskType != null">
+           and task_type = #{taskType}
+         </if>
+      </where>
+   </sql>
+   
+   <select id="queryOne"  parameterType="map"  resultMap="taskDomain">
+        select  r_id,task_type,table_fix from schedule_tablefix 
+        <include refid="where_condition"/>
+   </select>
+   
+</mapper>
