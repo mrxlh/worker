@@ -3,10 +3,8 @@ package com.collmall.controller;
 import com.collmall.query.WorkerQuery;
 import com.collmall.service.WorkerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Map;
 
@@ -23,13 +21,19 @@ public class WorkerController {
 	private WorkerService workerService;
 
 
+
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public ModelAndView index() {
+		return new ModelAndView("worker.html");
+	}
+
 	@RequestMapping(value = "/queryList")
 	public Map<String, ?> queryList(@ModelAttribute WorkerQuery query) {
 		return workerService.queryList(query).toPagination();
 	}
 
 	/**
-	 * 重置
+	 * 重置 /resetTask?task_type=write_back_sol&fingerprint=20618&status=0&execute_count=0
 	 * @param taskType
 	 * @param fingerprint
 	 * @param status
@@ -45,7 +49,7 @@ public class WorkerController {
 	}
 
 	/**
-	 * 手动执行
+	 * 手动执行 executeTask?task_type=write_back_sol&fingerprint=3
 	 * @param taskType
 	 * @param fingerprint
 	 * @return
