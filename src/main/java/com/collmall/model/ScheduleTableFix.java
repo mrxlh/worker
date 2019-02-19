@@ -5,7 +5,7 @@ package com.collmall.model;
  * @author xulihui
  * @since 2019- 01 -14 
  */
-public class ScheduleTablefix {
+public class ScheduleTableFix {
 	
 	private long id;
 	

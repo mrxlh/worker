@@ -1,6 +1,7 @@
 package com.collmall.schedule;
 
 import com.collmall.constant.TaskType;
+import com.collmall.model.WriteBackSolData;
 import com.xxl.job.core.handler.annotation.JobHandler;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @JobHandler(value="test")
 @Component
-public class TestSchedule extends ScheduleTaskProcess {
+public class TestSchedule extends ScheduleTaskProcess<WriteBackSolData> {
 
 
     @Override
@@ -19,8 +20,8 @@ public class TestSchedule extends ScheduleTaskProcess {
     }
 
     @Override
-    public void executeTask(Object o)  {
-        System.out.println(1/0);
+    public void executeTask(WriteBackSolData o)  {
+       // System.out.println(1/0);
        System.out.println("#####"+"哈哈" +"#####"+o.toString());
     }
 }

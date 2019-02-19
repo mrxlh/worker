@@ -6,6 +6,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.collmall.model.ScheduleParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.log.XxlJobLogger;
 import com.xxl.job.core.util.ShardingUtil;
 import org.apache.log4j.Logger;
 
@@ -20,8 +21,6 @@ import java.util.concurrent.*;
  * @date  2019-01-25
  */
 public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
-
-
 
     protected final static Logger logger = Logger.getLogger(AbstractScheduleTaskProcess.class);
 
@@ -46,6 +45,7 @@ public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
                         + (tasks == null ? 0 : tasks.size()) + "条");
             }
             if (tasks == null) {
+                XxlJobLogger.log("tasks is null");
                 return IJobHandler.FAIL;
             }
 
@@ -56,6 +56,8 @@ public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
             }
             return IJobHandler.SUCCESS;
         } catch (Exception e) {
+            logger.info("执行任务[" + this.getClass().getName() + "] 失败"+ e.getMessage());
+            XxlJobLogger.log("执行调度失败",e.toString());
             return IJobHandler.FAIL;
         }
     }

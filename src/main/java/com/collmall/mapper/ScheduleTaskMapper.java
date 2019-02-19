@@ -22,8 +22,6 @@ public interface ScheduleTaskMapper {
 
     List<ScheduleTask> queryExecuteTasks(Map<String, Object> map);
 
-    List<ScheduleTask> queryExecuteTasks1(Map<String, Object> map);
-
     int insertTask(ScheduleTask task);
 
     int lockTasks(Map<String, Object> map);

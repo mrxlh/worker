@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.collmall.mapper.ScheduleTablefixMapper">
-    <resultMap id="taskDomain" type="com.collmall.model.ScheduleTablefix">
+<mapper namespace="com.collmall.mapper.ScheduleTableFixMapper">
+    <resultMap id="taskDomain" type="com.collmall.model.ScheduleTableFix">
         <result property="id" column="r_id" jdbcType="INTEGER"/>
         <result property="taskType" column="task_type" jdbcType="VARCHAR"/>
         <result property="tableFix" column="table_fix" jdbcType="INTEGER"/>

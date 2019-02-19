@@ -86,16 +86,6 @@
         limit 0,${fetchCount}
     </select>
 
-    <select id="queryExecuteTasks1" resultMap="taskDomain" parameterType="map" resultType="com.collmall.model.ScheduleTask">
-        select
-        id,create_time,task_type,task_key1,task_key2,body_class,task_body,status,execute_count,last_time,region_no,remark,fingerprint
-        from schedule_task_${tableFix}
-        where
-        task_type=#{taskType,jdbcType=VARCHAR}
-        and (status=#{statusInit,jdbcType=INTEGER} )
-        limit 0,10000
-    </select>
-
     <select id="queryTask" resultMap="taskDomain" resultType="com.collmall.model.ScheduleTask" parameterType="map">
         SELECT
             id,

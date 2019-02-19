@@ -164,7 +164,6 @@ public class ScheduleTaskServiceImpl implements ScheduleTaskService {
                 .append(map.get("tableFix"));
         logger.info(sb.toString());
         List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks(map);
-//        List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks1(map);
         for (ScheduleTask task : list) {
             TaskResponse<T> response = this.getTaskResponse(task);
             response.setRetryCount(param.getDataRetryCount());

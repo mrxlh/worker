@@ -3,8 +3,8 @@ package com.collmall.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.collmall.exception.BusinessException;
-import com.collmall.mapper.ScheduleTablefixMapper;
-import com.collmall.model.ScheduleTablefix;
+import com.collmall.mapper.ScheduleTableFixMapper;
+import com.collmall.model.ScheduleTableFix;
 import com.collmall.model.ScheduleTask;
 import com.collmall.model.TaskResponse;
 import com.collmall.query.WorkerQuery;
@@ -31,7 +31,7 @@ public class WorkerServiceImpl implements WorkerService {
 	private ScheduleTaskService scheduleTaskService;
 
 	@Autowired
-	private ScheduleTablefixMapper scheduleTablefixMapper;
+	private ScheduleTableFixMapper scheduleTableFixMapper;
 
 
 	@Override
@@ -54,7 +54,7 @@ public class WorkerServiceImpl implements WorkerService {
 	private int getTableFix(String taskType) throws SQLException {
 		Map<String, Object> param = new HashMap<>();
 		param.put("taskType", taskType);
-		ScheduleTablefix queryOne = scheduleTablefixMapper.queryOne(param);
+		ScheduleTableFix queryOne = scheduleTableFixMapper.queryOne(param);
 		if (queryOne == null) {
 			throw new BusinessException("找不到任务设置：" + taskType);
 		}

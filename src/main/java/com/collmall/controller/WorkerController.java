@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * worker 监控
+ * @author xulihui
+ * @date 2019-02-19
+ */
 @RestController
 @RequestMapping("/worker")
 public class WorkerController {
@@ -23,6 +28,14 @@ public class WorkerController {
 		return workerService.queryList(query).toPagination();
 	}
 
+	/**
+	 * 重置
+	 * @param taskType
+	 * @param fingerprint
+	 * @param status
+	 * @param executeCount
+	 * @return
+	 */
 	@RequestMapping("/resetTask")
 	public Map<String, ?> resetTask(@RequestParam(value = "task_type", required = true) String taskType,
 			@RequestParam(value = "fingerprint", required = true) String fingerprint,
@@ -31,6 +44,12 @@ public class WorkerController {
 		return workerService.resetTask(taskType, fingerprint, status, executeCount).toMap();
 	}
 
+	/**
+	 * 手动执行
+	 * @param taskType
+	 * @param fingerprint
+	 * @return
+	 */
 	@RequestMapping("/executeTask")
 	public Map<String, ?> executeTask(@RequestParam(value = "task_type", required = true) String taskType,
 			@RequestParam(value = "fingerprint", required = true) String fingerprint) {
