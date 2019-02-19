@@ -29,8 +29,6 @@ public interface ScheduleTaskService {
 
     <T> List<TaskResponse<T>> queryExecuteTasks(String taskType, ScheduleParam param, Integer curServer);
 
-    <T> List<TaskResponse<T>> queryExecuteTasks(String taskType);
-
     <T> TaskResponse<T> queryTaskByFingerprint(String taskType, String fingerprint);
 
     ScheduleMonitorDTO queryMonitorCount(String taskType, int dataRetryCount);

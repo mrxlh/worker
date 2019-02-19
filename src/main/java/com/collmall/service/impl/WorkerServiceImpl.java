@@ -9,6 +9,7 @@ import com.collmall.model.ScheduleTask;
 import com.collmall.model.TaskResponse;
 import com.collmall.query.WorkerQuery;
 import com.collmall.result.Result;
+import com.collmall.schedule.ScheduleTaskProcess;
 import com.collmall.service.ScheduleTaskService;
 import com.collmall.service.WorkerService;
 import com.collmall.util.SpringContext;
@@ -61,13 +62,13 @@ public class WorkerServiceImpl implements WorkerService {
 	}
 
 	public Result<Integer> resetTask(String taskType, String fingerprint, int status, int executeCount) {
-		com.sprucetec.osc.schedule.MyScheduleTaskProcess<Object> taskProcess = getScheduleTaskProcess(taskType);
+		ScheduleTaskProcess<Object> taskProcess = getScheduleTaskProcess(taskType);
 		return new Result<>(taskProcess.resetTask(fingerprint, status, executeCount));
 	}
 
 	public Result<Integer> executeTask(String taskType, String fingerprint) {
 
-		com.sprucetec.osc.schedule.MyScheduleTaskProcess<Object> taskProcess = getScheduleTaskProcess(taskType);
+		ScheduleTaskProcess<Object> taskProcess = getScheduleTaskProcess(taskType);
 		TaskResponse<Object> response = taskProcess.queryTaskByFingerprint(fingerprint);
 		if (response != null) {
 			try {
@@ -93,11 +94,11 @@ public class WorkerServiceImpl implements WorkerService {
 
 	}
 
-	private <T> com.sprucetec.osc.schedule.MyScheduleTaskProcess<T> getScheduleTaskProcess(String taskType) {
-		Map<String, com.sprucetec.osc.schedule.MyScheduleTaskProcess> type = SpringContext.getBeansOfType(com.sprucetec.osc.schedule.MyScheduleTaskProcess.class);
-		Iterator<com.sprucetec.osc.schedule.MyScheduleTaskProcess> iterator = type.values().iterator();
+	private <T> ScheduleTaskProcess<T> getScheduleTaskProcess(String taskType) {
+		Map<String, ScheduleTaskProcess> type = SpringContext.getBeansOfType(ScheduleTaskProcess.class);
+		Iterator<ScheduleTaskProcess> iterator = type.values().iterator();
 		while (iterator.hasNext()) {
-			com.sprucetec.osc.schedule.MyScheduleTaskProcess taskProcess = iterator.next();
+			ScheduleTaskProcess taskProcess = iterator.next();
 			if (taskProcess.getTaskType().getCode().equals(taskType))
 				return taskProcess;
 		}

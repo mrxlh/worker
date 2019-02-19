@@ -9,7 +9,6 @@ import com.collmall.query.WorkerQuery;
 import com.collmall.service.IScheduleTaskProcess;
 import com.collmall.service.ScheduleTaskService;
 import com.collmall.util.ScheduleUtil;
-import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -150,11 +149,11 @@ public class ScheduleTaskServiceImpl implements ScheduleTaskService {
         Map<String, Object> map = new HashMap<>();
       //  map.put("regions", ScheduleUtil.getTaskRegions(param.getServerCount(), curServer));
         map.put("statusInit", IScheduleTaskProcess.TaskStatus_Init);
-       // map.put("statusExecuting", IScheduleTaskProcess.TaskStatus_executing);
-       // map.put("statusError", IScheduleTaskProcess.TaskStatus_error);
+        map.put("statusExecuting", IScheduleTaskProcess.TaskStatus_executing);
+        map.put("statusError", IScheduleTaskProcess.TaskStatus_error);
         map.put("lastTime", param.getRetryTimeInterval());
-     //   map.put("retryCount", param.getDataRetryCount());
-      //  map.put("fetchCount", param.getFetchCount());
+        map.put("retryCount", param.getDataRetryCount());// 失败重试的次数3
+        map.put("fetchCount", param.getFetchCount());// 一次限制100条
         map.put("taskType", taskType);
         map.put("tableFix", tableFix);
         StringBuilder sb = new StringBuilder(100);
@@ -164,40 +163,11 @@ public class ScheduleTaskServiceImpl implements ScheduleTaskService {
                 .append(map.get("fetchCount")).append(",taskType=").append(map.get("taskType")).append(",tableFix=")
                 .append(map.get("tableFix"));
         logger.info(sb.toString());
-     //   List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks(map);
-        List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks1(map);
+        List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks(map);
+//        List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks1(map);
         for (ScheduleTask task : list) {
             TaskResponse<T> response = this.getTaskResponse(task);
             response.setRetryCount(param.getDataRetryCount());
-            responses.add(response);
-        }
-        return responses;
-    }
-
-    @Override
-    public <T> List<TaskResponse<T>> queryExecuteTasks(String taskType) {
-        if (StringUtils.isEmpty(taskType)) {
-            throw new RuntimeException("taskType is null");
-        }
-        List<TaskResponse<T>> responses = new ArrayList<>();
-        Integer tableFix = this.getTableFix(taskType);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("statusInit", IScheduleTaskProcess.TaskStatus_Init);
-        map.put("taskType", taskType);
-        map.put("tableFix", tableFix);
-        StringBuilder sb = new StringBuilder(100);
-        sb.append("serverCount=").append(",curServer=")
-                .append(",serverArg=").append(",lastTime=").append(map.get("lastTime"))
-                .append(",retryCount=").append(map.get("retryCount")).append(",fetchCount=")
-                .append(map.get("fetchCount")).append(",taskType=").append(map.get("taskType")).append(",tableFix=")
-                .append(map.get("tableFix"));
-        logger.info(sb.toString());
-        //   List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks(map);
-        List<ScheduleTask> list = this.scheduleTaskMapper.queryExecuteTasks1(map);
-        for (ScheduleTask task : list) {
-            TaskResponse<T> response = this.getTaskResponse(task);
-            response.setRetryCount();
             responses.add(response);
         }
         return responses;

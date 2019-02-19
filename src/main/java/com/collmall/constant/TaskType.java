@@ -2,8 +2,9 @@ package com.collmall.constant;
 
 
 /**
- * @author meicai
  * worker任务类型
+ * @author xulihui
+ * @date 2019-02-18
  */
 public enum TaskType {
 	init_customer_banlance("init_customer_banlance","初始化商户余额"),

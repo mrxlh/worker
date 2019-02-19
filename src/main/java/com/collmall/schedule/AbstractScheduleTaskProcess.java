@@ -1,6 +1,8 @@
 package com.collmall.schedule;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.collmall.model.ScheduleParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
@@ -17,8 +19,9 @@ import java.util.concurrent.*;
  * @author  xulihui
  * @date  2019-01-25
  */
-@Deprecated
 public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
+
+
 
     protected final static Logger logger = Logger.getLogger(AbstractScheduleTaskProcess.class);
 
@@ -28,25 +31,33 @@ public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
 
     @Override
     public ReturnT<String> execute(String param) {
-        // 分片参数
-        ShardingUtil.ShardingVO sharding = ShardingUtil.getShardingVo();
-        ScheduleParam scheduleParam = new ScheduleParam();
-        List<T> tasks = this.selectTasks(scheduleParam, sharding.getIndex());
+        try {
+            ScheduleParam scheduleParam = new ScheduleParam();
+            if (param != null) {
+                logger.info("调度系统的参数: "+param);
+                scheduleParam = JSON.parseObject(param, new TypeReference<ScheduleParam>(){});
+            }
+            // 分片参数
+            ShardingUtil.ShardingVO sharding = ShardingUtil.getShardingVo();
+            List<T> tasks = this.selectTasks(scheduleParam, sharding.getIndex());
 
-        if (logger.isInfoEnabled()) {
-            logger.info("获取任务[" + this.getClass().getName() + "][" + sharding.getIndex() + "/" + sharding.getTotal() + "]共"
-                    + (tasks == null ? 0 : tasks.size()) + "条");
-        }
-        if (tasks == null) {
+            if (logger.isInfoEnabled()) {
+                logger.info("获取任务[" + this.getClass().getName() + "][" + sharding.getIndex() + "/" + sharding.getTotal() + "]共"
+                        + (tasks == null ? 0 : tasks.size()) + "条");
+            }
+            if (tasks == null) {
+                return IJobHandler.FAIL;
+            }
+
+            this.innerExecuteTasks(scheduleParam, tasks);
+            if (logger.isInfoEnabled()) {
+                logger.info(
+                        "执行任务[" + this.getClass().getName() + "][" + sharding.getIndex() + "/" + sharding.getTotal() + "]共" + tasks.size() + "条完成!");
+            }
+            return IJobHandler.SUCCESS;
+        } catch (Exception e) {
             return IJobHandler.FAIL;
         }
-
-        this.innerExecuteTasks(scheduleParam, tasks);
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                    "执行任务[" + this.getClass().getName() + "][" + sharding.getIndex() + "/" + sharding.getTotal() + "]共" + tasks.size() + "条完成!");
-        }
-        return IJobHandler.SUCCESS;
     }
 
     protected abstract List<T> selectTasks(ScheduleParam param, Integer curServer);
@@ -98,6 +109,30 @@ public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
         }
     }
 
+    private static <T> List<List<T>> splitList(List<T> tasks, int maxLen) {
+        if (maxLen <= 0) {
+            throw new RuntimeException("maxLen 不能小于等于0!");
+        }
+        List<List<T>> result = new ArrayList<List<T>>();
+        int count = 0;
+        if (tasks.size() % maxLen == 0) {
+            count = tasks.size() / maxLen;
+        } else {
+            count = tasks.size() / maxLen + 1;
+        }
+        for (int i = 0; i < count; i++) {
+            int fromIndex = i * maxLen;
+            int toIndex = 0;
+            if (i == count - 1) {
+                toIndex = tasks.size();
+            } else {
+                toIndex = (i + 1) * maxLen;
+            }
+            result.add(tasks.subList(fromIndex, toIndex));
+        }
+        return result;
+    }
+
     private static ExecutorService createCustomExecutorService(int poolSize, final String method) {
         int coreSize = poolSize;
         ThreadFactory tf = new ThreadFactory() {
@@ -123,29 +158,5 @@ public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
             }
         });
         return executor;
-    }
-
-    private static <T> List<List<T>> splitList(List<T> tasks, int maxLen) {
-        if (maxLen <= 0) {
-            throw new RuntimeException("maxLen 不能小于等于0!");
-        }
-        List<List<T>> result = new ArrayList<List<T>>();
-        int count = 0;
-        if (tasks.size() % maxLen == 0) {
-            count = tasks.size() / maxLen;
-        } else {
-            count = tasks.size() / maxLen + 1;
-        }
-        for (int i = 0; i < count; i++) {
-            int fromIndex = i * maxLen;
-            int toIndex = 0;
-            if (i == count - 1) {
-                toIndex = tasks.size();
-            } else {
-                toIndex = (i + 1) * maxLen;
-            }
-            result.add(tasks.subList(fromIndex, toIndex));
-        }
-        return result;
     }
 }
