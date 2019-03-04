@@ -237,7 +237,7 @@ class TableList extends PureComponent {
           type: 'user/fetchWokerList',
           payload: params,
         });
-        message.success(' 手动执行成功');
+       message.success(' 手动执行成功');
       },
     });
   };
@@ -308,6 +308,7 @@ class TableList extends PureComponent {
       {
         title: '异常',
         dataIndex: 'remark',
+        width: '15%'
       },
       {
         title: '操作',
@@ -334,9 +335,10 @@ class TableList extends PureComponent {
               loading={loading}
               data={tableData}
               rowKey={'id'}
-              scroll={{ x: 1250 }}
+              scroll={{ x: 1300 }}
               columns={columns}
               onChange={this.handleStandardTableChange}
+              rowSelection={null}
             />
           </div>
         </Card>
