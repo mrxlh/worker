@@ -3,8 +3,10 @@ package com.collmall.controller;
 import com.collmall.query.WorkerQuery;
 import com.collmall.service.WorkerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -20,12 +22,6 @@ public class WorkerController {
 	@Autowired
 	private WorkerService workerService;
 
-
-
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public ModelAndView index() {
-		return new ModelAndView("worker.html");
-	}
 
 	@RequestMapping(value = "/queryList")
 	public Map<String, ?> queryList(@ModelAttribute WorkerQuery query) {

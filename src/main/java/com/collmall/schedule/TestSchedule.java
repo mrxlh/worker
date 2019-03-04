@@ -16,7 +16,7 @@ public class TestSchedule extends ScheduleTaskProcess<WriteBackSolData> {
 
     @Override
     public TaskType getTaskType() {
-        return TaskType.write_back_sol;
+        return TaskType.init_customer_banlance;
     }
 
     @Override

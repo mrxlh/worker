@@ -7,8 +7,8 @@ public class WorkerQuery extends QueryParam {
 	private String taskType;
 	private String fingerprint;
 	private Integer status;
-	private Integer startTime;
-	private Integer endTime;
+	private String startTime;
+	private String endTime;
 	private String tableFix;
 
 	public String getTaskType() {
@@ -35,19 +35,19 @@ public class WorkerQuery extends QueryParam {
 		this.status = status;
 	}
 
-	public Integer getStartTime() {
+	public String getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Integer startTime) {
+	public void setStartTime(String startTime) {
 		this.startTime = startTime;
 	}
 
-	public Integer getEndTime() {
+	public String getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Integer endTime) {
+	public void setEndTime(String endTime) {
 		this.endTime = endTime;
 	}
 

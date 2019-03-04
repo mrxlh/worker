@@ -92,6 +92,13 @@
             <version>${ehcache.version}</version>
         </dependency>
 
+        <!-- SpringBoot自带热加载开发工具 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!--引入jquery-webjar-->
         <dependency>
             <groupId>org.webjars</groupId>
@@ -105,6 +112,7 @@
             <artifactId>bootstrap</artifactId>
             <version>${bootstrap.version}</version>
         </dependency>
+
     </dependencies>
 
     <dependencyManagement>

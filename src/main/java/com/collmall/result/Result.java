@@ -116,7 +116,7 @@ public class Result<T> implements Serializable {
 
 	public Map<String, ?> toPagination() {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("rows", this.getData());
+		map.put("list", this.getData());
 		map.put("page", this.getPage());
 		map.put("per_page", this.getPageSize());
 		map.put("total", this.getTotal());
@@ -126,7 +126,7 @@ public class Result<T> implements Serializable {
 	
 	public Map<String, ?> toPaginationAndSum(String message) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("rows", this.getData());
+		map.put("list", this.getData());
 		map.put("page", this.getPage());
 		map.put("per_page", this.getPageSize());
 		map.put("total", this.getTotal());
