@@ -2,17 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
 import router from 'umi/router';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Select,
-  Button,
-  DatePicker,
-  message,
-} from 'antd';
+import { Row, Col, Card, Form, Input, Select, Button, DatePicker, message } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -54,7 +44,6 @@ class TableList extends PureComponent {
       return newObj;
     }, {});
 
-
     const params = {
       page: pagination.current,
       pageSize: pagination.pageSize,
@@ -73,13 +62,23 @@ class TableList extends PureComponent {
 
   handleFormReset = () => {
     const { form, dispatch } = this.props;
+    const { getFieldValue } = form;
+    const taskType = getFieldValue('taskType');
     form.resetFields();
     this.setState({
       formValues: {},
     });
     dispatch({
       type: 'user/fetchWokerList',
-      payload: {},
+      payload: {
+        taskType,
+        startTime: moment()
+          .startOf('day')
+          .format('YYYY-MM-DD HH:mm:ss'),
+        endTime: moment()
+          .endOf('day')
+          .format('YYYY-MM-DD HH:mm:ss'),
+      },
     });
   };
 
@@ -90,10 +89,13 @@ class TableList extends PureComponent {
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      const dateRange = fieldsValue.date && fieldsValue.date.length ? [
-        fieldsValue.date[0].format("YYYY-MM-DD HH:mm:ss"),
-        fieldsValue.date[1].format("YYYY-MM-DD HH:mm:ss"),
-      ] : undefined;
+      const dateRange =
+        fieldsValue.date && fieldsValue.date.length
+          ? [
+              fieldsValue.date[0].format('YYYY-MM-DD HH:mm:ss'),
+              fieldsValue.date[1].format('YYYY-MM-DD HH:mm:ss'),
+            ]
+          : undefined;
       const values = {
         fingerprint: fieldsValue.fingerprint,
         status: fieldsValue.status,
@@ -116,7 +118,7 @@ class TableList extends PureComponent {
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
-      user: { workerNameAndStatus = {}},
+      user: { workerNameAndStatus = {} },
     } = this.props;
     const { task_type = [], worker_status = [] } = workerNameAndStatus;
     return (
@@ -128,7 +130,7 @@ class TableList extends PureComponent {
                 initialValue: task_type && task_type.length ? task_type[0].code : '',
               })(
                 <Select>
-                  {task_type.map((item) => {
+                  {task_type.map(item => {
                     return (
                       <Option value={item.code} key={item.code}>
                         {item.name}
@@ -142,8 +144,8 @@ class TableList extends PureComponent {
           <Col md={8} sm={24}>
             <FormItem label="状态">
               {getFieldDecorator('status')(
-                 <Select allowClear>
-                  {worker_status.map((item) => {
+                <Select allowClear>
+                  {worker_status.map(item => {
                     return (
                       <Option value={item.code} key={item.code}>
                         {item.name}
@@ -164,7 +166,10 @@ class TableList extends PureComponent {
           <Col md={12} sm={24}>
             <FormItem label="起止日期">
               {getFieldDecorator('date', {
-                initialValue: [moment(moment().format('YYYY-MM-DD 00:00:00')), moment(moment().format('YYYY-MM-DD 23:59:59'))]
+                initialValue: [
+                  moment(moment().format('YYYY-MM-DD 00:00:00')),
+                  moment(moment().format('YYYY-MM-DD 23:59:59')),
+                ],
               })(
                 <RangePicker
                   showTime={{
@@ -191,16 +196,16 @@ class TableList extends PureComponent {
   }
 
   // 重置
-  reset = (row) => {
+  reset = row => {
     const { dispatch } = this.props;
     //task_type=write_back_sol&fingerprint=20618&status=0&execute_count=0
     dispatch({
       type: 'user/workerResetTask',
       payload: {
         task_type: row.taskType,
-        fingerprint:row.fingerprint,
-        status:0,
-        execute_count:0
+        fingerprint: row.fingerprint,
+        status: 0,
+        execute_count: 0,
       },
       callback: () => {
         const { dispatch } = this.props;
@@ -216,16 +221,16 @@ class TableList extends PureComponent {
       },
     });
   };
-  
+
   // 手动执行
-  executeTask = (row) => {
+  executeTask = row => {
     // task_type=write_back_sol&fingerprint=3
     const { dispatch } = this.props;
     dispatch({
       type: 'user/workerRxecuteTask',
       payload: {
         task_type: row.taskType,
-        fingerprint:row.fingerprint
+        fingerprint: row.fingerprint,
       },
       callback: () => {
         const { dispatch } = this.props;
@@ -237,7 +242,7 @@ class TableList extends PureComponent {
           type: 'user/fetchWokerList',
           payload: params,
         });
-       message.success(' 手动执行成功');
+        message.success(' 手动执行成功');
       },
     });
   };
@@ -252,7 +257,7 @@ class TableList extends PureComponent {
       },
     });
     const {
-      user: { workerNameAndStatus = {}},
+      user: { workerNameAndStatus = {} },
     } = this.props;
     const { task_type = [], worker_status = [] } = workerNameAndStatus;
     const columns = [
@@ -273,17 +278,17 @@ class TableList extends PureComponent {
         title: '任务内容',
         dataIndex: 'taskBody',
         render(val) {
-          return (
-            <TextArea style={{ cursor: 'pointer' }} defaultValue={val} />
-          );
+          return <TextArea style={{ cursor: 'pointer' }} defaultValue={val} />;
         },
       },
       {
         title: '状态',
         dataIndex: 'status',
         width: '5%',
-        render: (val) => {
-          const statusObj = worker_status.filter(v => {return v.code == val});
+        render: val => {
+          const statusObj = worker_status.filter(v => {
+            return v.code == val;
+          });
           return statusObj.length ? statusObj[0].name : '';
         },
       },
@@ -294,21 +299,21 @@ class TableList extends PureComponent {
       {
         title: '创建时间',
         dataIndex: 'createTime',
-        render: (val) => {
+        render: val => {
           return moment(val).format('YYYY-MM-DD HH:mm:ss');
         },
       },
       {
         title: '最后执行时间',
         dataIndex: 'lastTime',
-        render: (val) => {
+        render: val => {
           return moment(val).format('YYYY-MM-DD HH:mm:ss');
         },
       },
       {
         title: '异常',
         dataIndex: 'remark',
-        width: '15%'
+        width: '15%',
       },
       {
         title: '操作',
@@ -317,9 +322,25 @@ class TableList extends PureComponent {
         render: (val, row) => {
           return (
             <div>
-              <a href='javascript:;' onClick={(e) => {e.preventDefault(); this.reset(row);}}>重置</a>
-              <a href='javascript:;'> | </a>
-              <a href='javascript:;' onClick={(e) => {e.preventDefault(); this.executeTask(row);}}>手动执行</a>
+              <a
+                href="javascript:;"
+                onClick={e => {
+                  e.preventDefault();
+                  this.reset(row);
+                }}
+              >
+                重置
+              </a>
+              <a href="javascript:;"> | </a>
+              <a
+                href="javascript:;"
+                onClick={e => {
+                  e.preventDefault();
+                  this.executeTask(row);
+                }}
+              >
+                手动执行
+              </a>
             </div>
           );
         },
