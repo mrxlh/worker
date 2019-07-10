@@ -7,7 +7,6 @@ import com.collmall.model.EnumModel;
 import com.collmall.result.Result;
 import com.collmall.util.EnumUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,7 +59,7 @@ public class EnumController {
 	}
 
 
-	@RequestMapping(value = "/getByName", method = RequestMethod.POST)
+	@RequestMapping(value = "/getByName")
 	public Result getByName(@RequestParam(value = "name",required = false) String shortName) {
 		List<EnumModel> list= EnumUtil.getByName(shortName);
 		return new Result<>(list);
