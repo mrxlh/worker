@@ -15,13 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date: 2019/3/6 11:28
  */
 @RestController
-@RequestMapping("/execute")
 public class ExecuteSqlController {
 
     @Autowired
     private ExecuteSqlService executeSqlService;
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/execute", method = RequestMethod.GET)
     public Result<Integer> index(@RequestParam(value = "sql", required = false) String sql) {
         if (StringUtils.isEmpty(sql)) {
             return  new Result<>(0);

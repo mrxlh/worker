@@ -46,7 +46,7 @@ public abstract class AbstractScheduleTaskProcess<T> extends IJobHandler {
             }
             if (tasks == null) {
                 XxlJobLogger.log("tasks is null");
-                return IJobHandler.FAIL;
+                return IJobHandler.SUCCESS;
             }
 
             this.innerExecuteTasks(scheduleParam, tasks);

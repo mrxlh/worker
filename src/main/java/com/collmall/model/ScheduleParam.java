@@ -10,13 +10,20 @@ import java.io.Serializable;
 public class ScheduleParam implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private int serverCount = 1;// 任务服务器数量
+	// 任务服务器数量
+	private int serverCount = 1;
+	// 服务器信息
 	private String serverArg;
+	// 一次限制100条
 	private int fetchCount = 100;
+	// 执行的数量
 	private int executeCount = 20;
+	// 创建本地线程数量
 	private int clientThreadCount = 5;
+    // 失败重试的次数
 	private int dataRetryCount = 3;
-	private int retryTimeInterval = 120; // 数据重试间隔时间秒
+	// 数据重试间隔时间秒
+	private int retryTimeInterval = 120;
 
 	public int getDataRetryCount() {
 		return dataRetryCount;

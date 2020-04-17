@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 往数据库中提交调度任务
@@ -27,7 +28,7 @@ import java.util.*;
 public class ScheduleTaskServiceImpl implements ScheduleTaskService {
 
     private static final Logger logger = Logger.getLogger(ScheduleTaskServiceImpl.class);
-    private static final Map<String, String> tableFixMap = new HashMap<>();
+    private static final Map<String, String> tableFixMap = new ConcurrentHashMap<>();
 
     @Autowired
     private ScheduleTaskMapper scheduleTaskMapper;

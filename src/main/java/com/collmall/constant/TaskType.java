@@ -7,11 +7,11 @@ package com.collmall.constant;
  * @date 2019-02-18
  */
 public enum TaskType {
-	init_customer_banlance("init_customer_banlance","初始化商户余额"),
 	update_customer_banlance("update_customer_banlance","更新商户余额"),
 	write_to_fi_ar("write_to_fi_ar","回传财务应收单"),
 	write_to_fi_rec("write_to_fi_rec","回传财务收款单"),
-	write_back_sol("write_back_sol", "回写台账收款")
+	write_back_sol("write_back_sol", "回写台账收款"),
+	create_driver_replenish("create_driver_replenish","创建司机补货")
 	;
 
 	private String code;
